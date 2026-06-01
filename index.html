@@ -223,18 +223,23 @@
     }
     .phone-mode-tab {
       flex: 1;
-      padding: 8px 12px;
-      font-size: 0.6875rem;
+      padding: 9px 10px;
+      font-size: 0.75rem;
       font-weight: 700;
       font-family: inherit;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
+      letter-spacing: 0;
+      text-transform: none;
       color: var(--muted);
       background: transparent;
       border: none;
       border-radius: 999px;
       cursor: pointer;
       transition: background 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      line-height: 1.2;
     }
     .phone-mode-tab.active {
       background: var(--dark);
@@ -250,7 +255,6 @@
       background: linear-gradient(165deg, var(--accent-light) 0%, var(--surface) 55%);
       border: 1.5px solid var(--border);
       border-radius: 22px;
-      text-align: center;
       animation: date-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
     @keyframes date-in {
@@ -327,6 +331,110 @@
     .btn-confirm-date.confirmed {
       background: var(--dark);
       box-shadow: none;
+    }
+
+    .dates-panel {
+      padding: 10px 12px 14px;
+    }
+    .dates-header {
+      font-size: 0.8125rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin: 0 2px 12px;
+      letter-spacing: -0.02em;
+    }
+    .dates-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 380px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      padding-right: 2px;
+    }
+    .date-card {
+      padding: 12px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 4px 16px rgba(26, 20, 18, 0.05);
+    }
+    .date-card-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .date-card-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      object-fit: cover;
+      object-position: center 15%;
+      flex-shrink: 0;
+    }
+    .date-card-body { flex: 1; min-width: 0; }
+    .date-card-name {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--dark);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .date-card-meta {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+    .date-card-when {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+    .date-card-confirm {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      font-family: inherit;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .date-card-confirm:hover { background: #c0583f; }
+    .date-card-confirm.confirmed {
+      background: var(--dark);
+      cursor: default;
+    }
+    .dates-empty {
+      text-align: center;
+      padding: 28px 12px;
+      font-size: 0.8125rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .phone-mode-tab .tab-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      font-size: 0.6875rem;
+      font-weight: 800;
+      border-radius: 999px;
+      background: rgba(212, 101, 74, 0.15);
+      color: var(--accent);
+    }
+    .phone-mode-tab.active .tab-badge {
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
     }
 
     .marquee-track {
@@ -696,7 +804,7 @@
         <div class="relative flex flex-col items-center w-full max-w-[300px] mx-auto">
           <div class="phone-mode-tabs w-full">
             <button type="button" class="phone-mode-tab active" data-mode="swipe">AI swiping</button>
-            <button type="button" class="phone-mode-tab" data-mode="date">Your date</button>
+            <button type="button" class="phone-mode-tab" data-mode="date">My dates<span id="dates-tab-badge" class="tab-badge">3</span></button>
           </div>
 
           <div class="phone-shell w-full">
@@ -719,25 +827,17 @@
               </div>
 
               <div id="phone-date-view" class="phone-view" hidden>
-                <div class="date-notification">
-                  <p class="date-notification-label">Tonight's plan</p>
-                  <div class="date-match-row">
-                    <img id="date-match-img" class="date-match-avatar" src="" alt="" />
-                    <div>
-                      <p class="date-match-name">Date with <span id="date-match-name">Maya</span></p>
-                      <p id="date-match-when" class="date-match-when">Thu · 7pm</p>
-                    </div>
-                  </div>
-                  <p id="date-match-venue" class="date-match-venue">Blue Note lounge</p>
-                  <p class="date-match-note">Picked for you both based on your profiles</p>
-                  <button type="button" id="btn-confirm-date" class="btn-confirm-date">Confirm</button>
+                <div class="dates-panel">
+                  <p id="dates-header" class="dates-header">3 plans ready</p>
+                  <div id="dates-list" class="dates-list"></div>
+                  <p id="dates-empty" class="dates-empty" hidden>No dates yet. Turn on AI handles it or like someone while swiping.</p>
                 </div>
               </div>
             </div>
           </div>
 
           <p class="text-center text-xs text-instinct-muted mt-5 max-w-[280px] mx-auto">
-            Interactive demo · Like someone to see your date plan
+            Interactive demo · AI swipes for you · tap My dates to see plans
           </p>
         </div>
       </div>
@@ -868,24 +968,65 @@
 
     const SWIPE_DECK = [...PROFILES];
 
-    /* Swipe stack + date notification demo */
+    /* Swipe stack + dates list demo */
     const stack = document.getElementById('swipe-stack');
     const phoneSwipeView = document.getElementById('phone-swipe-view');
     const phoneDateView = document.getElementById('phone-date-view');
     const phoneHeaderAutopilot = document.getElementById('phone-header-autopilot');
     const modeTabs = document.querySelectorAll('.phone-mode-tab');
-    const dateMatchImg = document.getElementById('date-match-img');
-    const dateMatchName = document.getElementById('date-match-name');
-    const dateMatchWhen = document.getElementById('date-match-when');
-    const dateMatchVenue = document.getElementById('date-match-venue');
-    const btnConfirmDate = document.getElementById('btn-confirm-date');
+    const datesList = document.getElementById('dates-list');
+    const datesEmpty = document.getElementById('dates-empty');
+    const datesTabBadge = document.getElementById('dates-tab-badge');
+    const datesHeader = document.getElementById('dates-header');
 
     let deck = [...SWIPE_DECK];
+    let approvedMatches = [WOMEN[0], WOMEN[2], MEN[0]];
     let autopilotOn = false;
     let autopilotTimer = null;
     let swiping = false;
     let phoneMode = 'swipe';
-    let dateProfile = deck[0];
+
+    function updateDatesBadge() {
+      const count = approvedMatches.length;
+      datesTabBadge.textContent = count;
+      datesTabBadge.hidden = count === 0;
+      if (datesHeader) {
+        datesHeader.textContent = count === 1 ? '1 plan ready' : `${count} plans ready`;
+        datesHeader.hidden = count === 0;
+      }
+    }
+
+    function renderDatesList() {
+      datesList.innerHTML = '';
+      const hasDates = approvedMatches.length > 0;
+      datesEmpty.hidden = hasDates;
+      datesList.hidden = !hasDates;
+      if (datesHeader) datesHeader.hidden = !hasDates;
+      if (!hasDates) return;
+
+      approvedMatches.forEach((profile) => {
+        const card = document.createElement('article');
+        card.className = 'date-card';
+        card.dataset.name = profile.name;
+        card.innerHTML = `
+          <div class="date-card-top">
+            <img class="date-card-avatar" src="${profile.img}" alt="" />
+            <div class="date-card-body">
+              <p class="date-card-name">${profile.name}, ${profile.age}</p>
+              <p class="date-card-meta"><span class="date-card-when">${profile.when}</span> · ${profile.venue}</p>
+            </div>
+          </div>
+          <button type="button" class="date-card-confirm">Confirm date</button>`;
+        const btn = card.querySelector('.date-card-confirm');
+        btn.addEventListener('click', () => {
+          btn.textContent = "You're all set ✓";
+          btn.classList.add('confirmed');
+          const rect = btn.getBoundingClientRect();
+          burstConfetti(rect.left + rect.width / 2, rect.top, 25);
+        });
+        datesList.appendChild(card);
+      });
+    }
 
     function setPhoneMode(mode) {
       phoneMode = mode;
@@ -895,29 +1036,18 @@
       phoneSwipeView.hidden = mode !== 'swipe';
       phoneDateView.hidden = mode !== 'date';
       phoneHeaderAutopilot.hidden = mode !== 'swipe';
-      if (mode === 'date') {
-        phoneDateView.querySelector('.date-notification').style.animation = 'none';
-        void phoneDateView.offsetWidth;
-        phoneDateView.querySelector('.date-notification').style.animation = '';
-      }
+      if (mode === 'date') renderDatesList();
     }
 
     modeTabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        setPhoneMode(tab.dataset.mode);
-        if (tab.dataset.mode === 'date') updateDateNotification(dateProfile);
-      });
+      tab.addEventListener('click', () => setPhoneMode(tab.dataset.mode));
     });
 
-    function updateDateNotification(profile) {
-      if (!profile) return;
-      dateProfile = profile;
-      dateMatchImg.src = profile.img;
-      dateMatchName.textContent = profile.name;
-      dateMatchWhen.textContent = profile.when;
-      dateMatchVenue.textContent = profile.venue;
-      btnConfirmDate.textContent = 'Confirm';
-      btnConfirmDate.classList.remove('confirmed');
+    function addApproved(profile) {
+      if (!profile || approvedMatches.some((p) => p.name === profile.name)) return;
+      approvedMatches.push(profile);
+      updateDatesBadge();
+      if (phoneMode === 'date') renderDatesList();
     }
 
     function renderStack() {
@@ -935,13 +1065,12 @@
           </div>`;
         stack.appendChild(card);
       });
-      if (phoneMode === 'swipe') updateDateNotification(deck[0]);
     }
 
     function swipe(direction) {
       if (swiping || deck.length === 0) return;
       swiping = true;
-      const matched = direction === 'right' ? deck[0] : null;
+      const profile = deck[0];
       const top = stack.querySelector('.swipe-card');
       if (!top) { swiping = false; return; }
       top.classList.add(direction === 'right' ? 'swipe-right' : 'swipe-left');
@@ -950,39 +1079,38 @@
         if (deck.length === 0) deck = [...SWIPE_DECK];
         renderStack();
         swiping = false;
-        if (matched) {
-          updateDateNotification(matched);
-          if (autopilotOn) setAutopilot(false);
-          setPhoneMode('date');
-        }
+        if (direction === 'right') addApproved(profile);
       }, 400);
     }
 
     renderStack();
-    updateDateNotification(deck[0]);
+    updateDatesBadge();
 
     document.getElementById('btn-like').addEventListener('click', () => swipe('right'));
     document.getElementById('btn-nope').addEventListener('click', () => swipe('left'));
 
-    btnConfirmDate.addEventListener('click', () => {
-      btnConfirmDate.textContent = "You're all set ✓";
-      btnConfirmDate.classList.add('confirmed');
-      const rect = btnConfirmDate.getBoundingClientRect();
-      burstConfetti(rect.left + rect.width / 2, rect.top, 35);
-    });
-
     const toggle = document.getElementById('autopilot-toggle');
     const actions = document.getElementById('swipe-actions');
+
+    function scheduleAutopilotSwipe() {
+      clearTimeout(autopilotTimer);
+      if (!autopilotOn) return;
+      const delay = 900 + Math.random() * 700;
+      autopilotTimer = setTimeout(() => {
+        if (!autopilotOn) return;
+        const direction = Math.random() < 0.42 ? 'right' : 'left';
+        swipe(direction);
+        scheduleAutopilotSwipe();
+      }, delay);
+    }
 
     function setAutopilot(on) {
       autopilotOn = on;
       toggle.setAttribute('aria-pressed', on ? 'true' : 'false');
       actions.style.opacity = on ? '0.35' : '1';
       actions.style.pointerEvents = on ? 'none' : 'auto';
-      clearInterval(autopilotTimer);
-      if (on) {
-        autopilotTimer = setInterval(() => swipe('right'), 1400);
-      }
+      clearTimeout(autopilotTimer);
+      if (on) scheduleAutopilotSwipe();
     }
 
     toggle.addEventListener('click', () => setAutopilot(!autopilotOn));
