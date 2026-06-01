@@ -68,7 +68,7 @@ const slides = [
     label: 'The ask',
     title: 'Raising a seed round.',
     body: 'Building the first dating app where AI runs the entire funnel so users skip to the good part.',
-    email: 'investors@instinct.app',
+    email: 'investors@instinct-steel.vercel.app',
   },
 ];
 
